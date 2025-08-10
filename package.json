@@ -1,0 +1,7 @@
+{
+  "name": "news-editor",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "tsc --watch"
+  }
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>News Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-field">
+        <div class="main-field__text">
+          <div
+            contenteditable="true"
+            class="main-field__field"
+            id="editor"
+          ></div>
+          <div class="main-tools">
+            <div class="main-tools__screen" data-screen="home-screen">
+              <button class="main-tools__tool" data-action="headers">
+                H
+              </button>
+              <button
+                class="main-tools__tool"
+                data-action="paragraph"
+              >
+                P
+              </button>
+              <button class="main-tools__tool" data-action="lists">
+                UL
+              </button>
+              <button class="main-tools__tool" data-action="example">
+                EXAMPLE
+              </button>
+              <button class="main-tools__tool" data-action="mark">
+                MARK
+              </button>
+              <button class="main-tools__tool" data-action="strong">
+                STRONG
+              </button>
+              <button class="main-tools__tool" data-action="wrap-in">
+                WRAP IN
+              </button>
+              <button class="main-tools__tool" data-action="unwrap">
+                UNWRAP
+              </button>
+            </div>
+            <div
+              class="main-tools__screen d-none"
+              data-screen="headers"
+            >
+              <button class="main-tools__tool" data-action="header-1">
+                H1
+              </button>
+              <button class="main-tools__tool" data-action="header-2">
+                H2
+              </button>
+              <button class="main-tools__tool" data-action="header-3">
+                H3
+              </button>
+              <button class="main-tools__tool" data-action="header-4">
+                H4
+              </button>
+              <button class="main-tools__tool" data-action="header-5">
+                H5
+              </button>
+              <button class="main-tools__tool" data-action="header-6">
+                H6
+              </button>
+              <button
+                class="main-tools__tool"
+                data-action="header-back"
+              >
+                BACK
+              </button>
+            </div>
+            <div
+              class="main-tools__screen d-none"
+              data-screen="ul-screen"
+            >
+              <button class="main-tools__tool" data-action="list-ul">
+                UL
+              </button>
+              <button class="main-tools__tool" data-action="list-ol">
+                OL
+              </button>
+              <button
+                class="main-tools__tool"
+                data-action="list-back"
+              >
+                BACK
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="main-field__buttons">
+          <button class="main-field__button">
+            Стилизовать вставленный текст
+          </button>
+          <button class="main-field__button">Копировать html</button>
+        </div>
+      </div>
+    </div>
+    <script src="./script.js"></script>
+  </body>
+</html>
