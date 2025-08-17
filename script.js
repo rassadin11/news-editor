@@ -289,8 +289,10 @@ function getRangeSelectedNodes(range) {
 document.onselectionchange = function () {
     var selection = document.getSelection();
     var panel = document.querySelector('.main-tools');
+    console.log(selection.toString());
     if (selection.toString()) {
         var coords = selection.anchorNode.parentNode.getBoundingClientRect();
+        console.log(coords);
         panel.style.top = coords.top - 50 + 'px';
         panel.style.left = coords.left + 'px';
         panel.style.display = 'block';
@@ -345,7 +347,7 @@ editor.addEventListener('input', function () {
 });
 // ! validate code from google word
 function validateP(item) {
-    var span = item.querySelectorAll('span');
+    var span = item.querySelectorAll('& > *');
     if (span.length === 2) {
         if (span[0].style.fontWeight === '700') {
             var p = document.createElement('p');
@@ -357,16 +359,21 @@ function validateP(item) {
         }
     }
     else {
-        var tag = span[0];
-        if (!tag)
-            return;
-        if (tag.style.fontSize === '11pt' &&
-            tag.style.fontWeight === '') {
-            var p = document.createElement('p');
-            p.textContent = tag.innerHTML;
-            item.insertAdjacentElement('beforebegin', p);
-            item.remove();
-        }
+        var result_1 = '';
+        span.forEach(function (tag) {
+            if (tag.nodeName === 'A') {
+                var link = tag;
+                result_1 += "<a href=".concat(link.href, ">").concat(link.querySelector('span').innerHTML, "</a>");
+            }
+            if (tag.style.fontSize === '11pt' &&
+                tag.style.fontWeight === '') {
+                result_1 += tag.innerHTML;
+            }
+        });
+        var p = document.createElement('p');
+        p.insertAdjacentHTML('beforeend', result_1);
+        item.insertAdjacentElement('beforebegin', p);
+        item.remove();
     }
 }
 function validateLi(item, obj, ol_obj) {
@@ -390,8 +397,11 @@ function createNewLists(obj, list) {
     var keys = Object.keys(obj);
     keys.forEach(function (item) {
         var lis = obj[item];
-        var old_ul = document.querySelector("#".concat(item));
+        var old_ul = document.getElementById(item);
+        if (!old_ul)
+            return;
         var new_ul = document.createElement(list);
+        new_ul.classList.add('list');
         lis.forEach(function (elem) {
             new_ul.insertAdjacentHTML('beforeend', "<li>".concat(elem.innerHTML, "</li>"));
         });
@@ -426,7 +436,7 @@ function validateTitle(item) {
     item.remove();
 }
 function validateText() {
-    var elems = Array.from(editor.querySelectorAll('[dir="ltr"]'));
+    var elems = editor.querySelectorAll('[dir="ltr"]');
     var uls = editor.querySelectorAll('ul');
     var ols = editor.querySelectorAll('ol');
     uls.forEach(function (item, idx) {
@@ -446,11 +456,23 @@ function validateText() {
             validateLi(item, uls_divider, ols_divider);
         else if (item.nodeName === 'DIV')
             validateDiv(item);
-        else if (item.nodeName.includes('H'))
+        else if (item.nodeName.indexOf('H') > -1)
             validateTitle(item);
     });
     createNewLists(uls_divider, 'ul');
     createNewLists(ols_divider, 'ol');
 }
-var googleButton = document.querySelector('.main-field__button');
+var googleButton = document.querySelector('.main-field__button.google');
 googleButton.addEventListener('click', validateText);
+var copyHTML = document.querySelector('.main-field__button.html');
+copyHTML.addEventListener('click', function () {
+    var html = editor.outerHTML; // берём сам элемент с тегами
+    navigator.clipboard
+        .writeText(html)
+        .then(function () {
+        alert('HTML элемента скопирован в буфер обмена!');
+    })
+        .catch(function (err) {
+        console.error('Ошибка копирования: ', err);
+    });
+});

@@ -339,10 +339,13 @@ function getRangeSelectedNodes(range) {
 document.onselectionchange = function () {
   const selection: any = document.getSelection()
   const panel: HTMLDivElement = document.querySelector('.main-tools')
+  console.log(selection.toString())
 
   if (selection.toString()) {
     const coords: DOMRect =
       selection.anchorNode.parentNode.getBoundingClientRect()
+
+    console.log(coords)
 
     panel.style.top = coords.top - 50 + 'px'
     panel.style.left = coords.left + 'px'
@@ -438,7 +441,7 @@ type ULS_DIVIDER = {[name: string]: HTMLElement[]}
 // ! validate code from google word
 
 function validateP(item) {
-  const span: HTMLSpanElement[] = item.querySelectorAll('span')
+  const span: HTMLElement[] = item.querySelectorAll('& > *')
 
   if (span.length === 2) {
     if (span[0].style.fontWeight === '700') {
@@ -455,20 +458,28 @@ function validateP(item) {
       item.remove()
     }
   } else {
-    const tag: HTMLSpanElement = span[0]
+    let result = ''
 
-    if (!tag) return
+    span.forEach(tag => {
+      if (tag.nodeName === 'A') {
+        const link = tag as HTMLLinkElement
+        result += `<a href=${link.href}>${
+          link.querySelector('span').innerHTML
+        }</a>`
+      }
+      if (
+        tag.style.fontSize === '11pt' &&
+        tag.style.fontWeight === ''
+      ) {
+        result += tag.innerHTML
+      }
+    })
 
-    if (
-      tag.style.fontSize === '11pt' &&
-      tag.style.fontWeight === ''
-    ) {
-      const p = document.createElement('p')
-      p.textContent = tag.innerHTML
+    const p = document.createElement('p')
+    p.insertAdjacentHTML('beforeend', result)
 
-      item.insertAdjacentElement('beforebegin', p)
-      item.remove()
-    }
+    item.insertAdjacentElement('beforebegin', p)
+    item.remove()
   }
 }
 
@@ -491,8 +502,13 @@ function createNewLists(obj: ULS_DIVIDER, list: 'ul' | 'ol') {
 
   keys.forEach(item => {
     const lis = obj[item]
-    const old_ul = document.querySelector(`#${item}`)
+
+    const old_ul = document.getElementById(item)
+    if (!old_ul) return
+
     const new_ul = document.createElement(list)
+
+    new_ul.classList.add('list')
 
     lis.forEach(elem => {
       new_ul.insertAdjacentHTML(
@@ -539,9 +555,7 @@ function validateTitle(item) {
 }
 
 function validateText() {
-  const elems: HTMLElement[] = Array.from(
-    editor.querySelectorAll('[dir="ltr"]')
-  )
+  const elems = editor.querySelectorAll('[dir="ltr"]')
 
   const uls = editor.querySelectorAll('ul')
   const ols = editor.querySelectorAll('ol')
@@ -565,7 +579,7 @@ function validateText() {
     else if (item.nodeName === 'LI')
       validateLi(item, uls_divider, ols_divider)
     else if (item.nodeName === 'DIV') validateDiv(item)
-    else if (item.nodeName.includes('H')) validateTitle(item)
+    else if (item.nodeName.indexOf('H') > -1) validateTitle(item)
   })
 
   createNewLists(uls_divider, 'ul')
@@ -573,7 +587,24 @@ function validateText() {
 }
 
 const googleButton: HTMLButtonElement = document.querySelector(
-  '.main-field__button'
+  '.main-field__button.google'
 )
 
 googleButton.addEventListener('click', validateText)
+
+const copyHTML: HTMLButtonElement = document.querySelector(
+  '.main-field__button.html'
+)
+
+copyHTML.addEventListener('click', () => {
+  const html = editor.outerHTML // берём сам элемент с тегами
+
+  navigator.clipboard
+    .writeText(html)
+    .then(() => {
+      alert('HTML элемента скопирован в буфер обмена!')
+    })
+    .catch(err => {
+      console.error('Ошибка копирования: ', err)
+    })
+})
